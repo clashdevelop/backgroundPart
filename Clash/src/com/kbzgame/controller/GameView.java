@@ -1,96 +1,161 @@
 package com.kbzgame.controller;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import net.sf.json.JSONObject;
+
 import com.kbzgame.service.command.Command;
 import com.kbzgame.service.event.Event;
+import com.kbzgame.service.event.EventFactory;
+import com.kbzgame.service.gamebase.Crashable;
+import com.kbzgame.service.gamebase.GameScene;
+import com.kbzgame.service.gamebase.JsonVisitor;
+import com.kbzgame.service.gamebase.Movable;
 import com.kbzgame.service.gamebase.Roller;
-import com.kbzgame.utils.Vector;
+import com.kbzgame.utils.Point;
+import com.kbzgame.utils.Rect;
+import com.kbzgame.utils.Shape;
 
-public abstract class GameView {
-	private List<Command> commandList = new ArrayList<Command>();//å‘½ä»¤
-	private List<Roller> rollerList = new ArrayList<Roller>();//çƒ
-	private List<Event> eventList = new ArrayList<Event>();//äº‹ä»¶
-	private ExecutorService manager = Executors.newCachedThreadPool();//çº¿ç¨‹æ± 
-	private static volatile boolean startTask = false;
+public class GameView {
+	public static Shape gameShape = new Rect(new Point(0,0),new Point(800,800));
+	private List<Roller> rollerList = new ArrayList<Roller>();
+	private List<GameScene> sceneList = new ArrayList<GameScene>();
+	private List<Movable> moverList = new ArrayList<Movable>();
+	private List<Event> eventList = new ArrayList<Event>();
+	private List<Crashable> crashableList = new ArrayList<Crashable>();
 	
+	private ExecutorService taskManager = Executors.newCachedThreadPool();	
+	
+	private String message;
+	private volatile boolean updateMess;
 	public GameView(){
-		Roller roller = new Roller("Bob");
-		roller.addF(new Vector(0,0,1,1));
-		addRoller(roller);
-		startTask = true;
-		manager.execute(new UpdateTask());
+		updateMess = true;
+		taskManager.execute(new UpdateTask());
 	}
-	public void addCommand(Command command){
-		synchronized (commandList) {
-			commandList.add(command);
+	public void addRoller(Roller newRoller){
+		synchronized (this){
+			addCrashable(newRoller);
+			addMovable(newRoller);
+			rollerList.add(newRoller);		
 		}
 	}
-	public void addEvent(Event event){
-		synchronized (eventList) {
-			eventList.add(event);
+	public void exeCommand(Command exeCommand){
+		synchronized (this) {
+			System.out.println("Execute command");
+			exeCommand.execute();//ÃüÁîµÄÖ´ĞĞĞèÒª¸Ä±äroller¶ÔÏó,ÁÙ½ç×ÊÔ´
 		}
 	}
-	public void addRoller(Roller roller){
-		synchronized (rollerList){
-			rollerList.add(roller);
+	public void removeRoller(Roller deadRoller){
+		synchronized (this){
+			deadRoller.dead();
 		}
 	}
-	public void dispose(){//ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½
-		startTask = false;
+	public synchronized String getMessage(){
+		if(updateMess){
+			updateMess = false;
+			message = "";
+			JSONObject sendMess = new JSONObject();
+			sendMess.put("type", "allBall");
+			for(Roller roller:rollerList){
+				JsonVisitor jsonVisitor = new JsonVisitor(roller);
+				sendMess.put("content", jsonVisitor.toString());
+			}
+			message += sendMess.toString();
+		}
+		return message;
+	}
+	public void dispose(){//ÓÎÏ·½áÊøÓÃÓÚÖÕ½áÆô¶¯µÄÏß³Ì
+		//stop = true;
+		taskManager.shutdownNow();
 	}		
-
-	
 	protected class UpdateTask implements Runnable{
-	
 		@Override
 		public void run(){
-			while(startTask){
-				//Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-				System.out.println("execute commands!");
-				synchronized (commandList) {
-					for(Command exeCommand:commandList){
-						exeCommand.execute();
-						commandList.remove(exeCommand);
+			//¶ÔÍæ¼ÒÎ»ÖÃ¸üĞÂ
+			try {
+				while(!Thread.interrupted()){
+//					System.out.println("update roller!");
+					List<Movable> deadMoverList = new ArrayList<Movable>();
+					List<Event> deadEventLsit = new ArrayList<Event>();
+					Iterator<Movable> moverItor =  moverList.iterator();
+					Iterator<Event> eventItor =  eventList.iterator();
+					synchronized (this){
+						while(moverItor.hasNext()){
+							Movable mover = moverItor.next();
+							if(mover.alive()){
+								mover.move();		
+							}
+							else{
+								deadMoverList.add(mover);
+							}
+						}
+						while(eventItor.hasNext()){
+							Event event = eventItor.next();
+							if(event.alive()){
+								if(event.happen())
+									event.action();
+							}else{
+								deadEventLsit.add(event);
+							}		
+						}
+						//ÇåÀí²»´æÔÚµÄeventºÍmovable
+						moverList.removeAll(deadMoverList);
+						eventList.removeAll(deadEventLsit);
+						//¸üĞÂÆäËûµÄÏà¹ØµÄlist
+						updateList();
+						updateMess = true;//ĞèÒªË¢ĞÂmessage
 					}
+					TimeUnit.MICROSECONDS.sleep(200);
 				}
-				//ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã¸ï¿½ï¿½ï¿½
-				System.out.println("update roller!");
-				Iterator<Roller> rollerItor = null;
-				synchronized (rollerList){
-					rollerItor = rollerList.iterator();
-					while(rollerItor.hasNext()){
-						Roller movingRoller = rollerItor.next();
-						movingRoller.move();
-						System.out.println(""+movingRoller);
-					}
-				}
-				//ï¿½Â¼ï¿½ï¿½Ä¼ï¿½ï¿½
-				System.out.println("test events!");
-				synchronized (eventList) {
-					for(Event testEvent:eventList){
-						testEvent.test();
-						if(testEvent.happen());
-							testEvent.action();
-					}
-				}
-				
-				try {
-					TimeUnit.SECONDS.sleep(1);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					System.out.println("UpdateThread was Interrupted!");	
-					//e.printStackTrace();
-				}
-				
+			}catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	private void addCrashable(Crashable newCrashable){
+		for(Crashable crashable:crashableList){
+			Event event = EventFactory.creatEvent(crashable, newCrashable);
+			eventList.add(event);
+		}
+		crashableList.add(newCrashable);
+	}
+	private void addMovable(Movable movable){
+		Event event = EventFactory.creatEvent(movable);
+		eventList.add(event);
+		moverList.add(movable);
+	}
+	private void updateList(){//moverListºÍeventListÔÚÖ´ĞĞ¸üĞÂ£¬Ê¡È¥Ò»´Î±éÀú
+		List<Roller> deadRollerList = new ArrayList<Roller>();
+		for(Roller roller:rollerList){
+			if(!roller.alive()){
+				deadRollerList.add(roller);
 			}
 		}
+		rollerList.removeAll(deadRollerList);
+		
+		List<GameScene> deadSceneList = new ArrayList<GameScene>();
+		for(GameScene scene:sceneList){
+			if(!scene.alive()){
+				deadSceneList.add(scene);
+			}
+		}
+		sceneList.removeAll(deadSceneList);
+		
+		List<Crashable> deadCrashableList = new ArrayList<Crashable>();
+		for(Crashable crashable:crashableList){
+			if(!crashable.alive()){
+				deadCrashableList.add(crashable);
+			}
+		}
+		crashableList.removeAll(deadCrashableList);
+		
 	}
 }
 

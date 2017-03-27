@@ -18,9 +18,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<!--
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	-->
+	<title>A WebSocket Test</title>
   </head>
   
   <body>
-    This is my JSP page. <br>
+   <input id="message" type="text"/><br/>
+   <button id="send">SendMessage</button><br/>
+   <button id="close">CloseConnection</button><br/>
+   <div id="show"></div>
   </body>
+  <script type="text/javascript" src="./Js/test.js">
+  </script>
 </html>

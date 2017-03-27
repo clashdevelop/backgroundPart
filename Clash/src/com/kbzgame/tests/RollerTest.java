@@ -12,18 +12,18 @@ public class RollerTest {
 		System.out.println("Move.....");
 		roller.move();
 		//roller.test();
-		System.out.println("Roller's position:"+roller.getPositionX()+" "+roller.getPositionY());
+		//System.out.println("Roller's position:"+roller.getPositionX()+" "+roller.getPositionY());
 		Vector f1 = new Vector(0,0,1,1);
-		roller.addF(f1);
+	//	roller.addF(f1);
 		System.out.println("After addF:");
 		System.out.println("Move.....");
 		roller.move();
 		//roller.test();
-		System.out.println("Roller's position:"+roller.getPositionX()+" "+roller.getPositionY());
+		//System.out.println("Roller's position:"+roller.getPositionX()+" "+roller.getPositionY());
 		System.out.println("Move.....");
 		roller.move();
 		//roller.test();
-		System.out.println("Roller's position:"+roller.getPositionX()+" "+roller.getPositionY());
+		//System.out.println("Roller's position:"+roller.getPositionX()+" "+roller.getPositionY());
 	}
 
 }

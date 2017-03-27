@@ -9,7 +9,7 @@ public class VectorTest {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Vector v1 = new Vector(1,Math.PI/2);
+		/*Vector v1 = new Vector(1,Math.PI/2);
 		Vector v2 = new Vector(1,Math.PI*3/2);
 		Vector v3 = new Vector(1,0);
 		Vector v4 = new Vector(4,Math.PI/2);
@@ -36,7 +36,9 @@ public class VectorTest {
 			System.out.println("y= "+v.getComponentY());
 			System.out.println("angle= "+v.getAngle());
 			System.out.println("______________________");
-		}
+		}*/
+		Vector v = new Vector(4,-Math.PI/4);
+		System.out.println(v.getComponentX()+","+v.getComponentY());
 	}
 
 }

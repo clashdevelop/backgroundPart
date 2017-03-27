@@ -1,27 +1,38 @@
 package com.kbzgame.service.gamebase;
 
+import com.kbzgame.utils.Circle;
 import com.kbzgame.utils.Point;
+import com.kbzgame.utils.Shape;
 import com.kbzgame.utils.Vector;
 
-public class Roller {
-	private final static float k =  0.25f;
-	private final static float g = 9.8f;
+public class Roller implements Crashable{
+	private static int count = 0;
+	
+	private final float k =  0.25f;
+	private final float g = 9.8f;
+	private final int id = count++;
+	
 	private Point position;
-	private Vector F;//外力
+	private float r;
+	//private Vector mouseF;//鼠标提供的外力
+	private Vector otherF;//其他的力
 	private Vector v;//速度
 	private Vector a;//加速度
 	private int m;//质量
 	private String name;
+	private boolean alive;
 	public Roller(String name){
 		this.name = name;
 		position = new Point(0,0);
 		a = new Vector(0,0);
 		v = new Vector(0,0);
-		F = new Vector(0,0);
+		alive = true;
+	//	mouseF = new Vector(0,0);
+		otherF = new Vector(0,0);
+		r = 5;
 		m = 1;
 	}
-	
-	
+	@Override
 	public void move(){
 		Vector fTotal = new Vector(0,0);
 		if(v.getSize()!=0){
@@ -30,28 +41,61 @@ public class Roller {
 			Vector f = new Vector(fSize,v.getAngle()+Math.PI);//方向与速度方向相反
 			fTotal.addVector(f);
 		}
-		fTotal.addVector(F);
-		//F.reset(0,0);//更新位置之后，力变化
+		fTotal.addVector(otherF);
+		otherF.resetComponent(0,0);//更新位置之后，力变化
 		//System.out.println(""+fTotal.getSize()+" "+fTotal.getComponentX()+" "+fTotal.getComponentY());
 		a = fTotal.divByNum(m);
 		changeV();
 		changePosition();
 		
 	}
+	@Override
+	public int getM() {
+		// TODO Auto-generated method stub
+		return m;
+	}
+	@Override
+	public Vector getV(){
+		return v;
+	}
 
-	public void clearF(){
-		F.reset(0,0);
+	@Override
+	public void outAction(Vector backVector) {
+		// TODO Auto-generated method stub
+		position.changeBy(backVector.getComponentX(),backVector.getComponentY());
 	}
-	public void addF(Vector addendF){
-		F.addVector(addendF);
+
+	@Override
+	public Shape getShape() {
+		// TODO Auto-generated method stub
+		return new Circle(position,getShapeR());
 	}
-	public double getPositionX(){
-		return position.getX();
+	@Override
+	public boolean alive(){
+		return alive;
 	}
-	public double getPositionY(){
-		return position.getY();
+	@Override
+	public void crashAction(Vector F) {
+		// TODO Auto-generated method stub
+		otherF.addVector(F);;
 	}
+	public void dead(){
+		alive = false;
+	}
+	public void addMouseF(Vector mouseF){
+		otherF.addVector(mouseF);;
+	}
+	public Point getPosition(){return position;}
+	public int getID(){return id;}
 	
+	public String toString(){
+		return id+"("+position+")"+name;
+	}
+	public void acceptJsonVisitor(JsonVisitor.Message message){
+		message.setId(id);
+		message.setName(name);
+		message.setPosition(position);
+	}
 	
 	private void changeV(){
 		v.addVector(a);
@@ -59,12 +103,7 @@ public class Roller {
 	private void changePosition(){
 		position.changeBy(v.getComponentX(),v.getComponentY());
 	}
-	/*public  void test(){
-		System.out.println("F: "+F.getSize()+" "+F.getComponentX()+" "+F.getComponentY());
-		System.out.println("v: "+v.getSize()+" "+v.getComponentX()+" "+v.getComponentY());
-		System.out.println("a: "+a.getSize()+" "+a.getComponentX()+" "+a.getComponentY());
-	}*/
-	public String toString(){
-		return name+"("+getPositionX()+","+getPositionY()+")";
+	private float getShapeR(){
+		return r;
 	}
 }

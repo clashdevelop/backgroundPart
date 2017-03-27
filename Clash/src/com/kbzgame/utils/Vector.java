@@ -5,7 +5,7 @@ public class Vector {
 	private double componentY;
 	public Vector(){}
 	public Vector(double size,double angle){//大小方向初始化
-		if(angle>=2*Math.PI){angle -= 2*Math.PI;}
+		//if(angle>=2*Math.PI){angle -= 2*Math.PI;}
 
 		componentX = size*Math.cos(angle);
 		componentY = size*Math.sin(angle);
@@ -22,7 +22,12 @@ public class Vector {
 		//sizeY = size*Math.sin(angle);
 	}
 	
-	
+	public static Vector convertVectorToReferenceFrame(Vector source,Vector xvector){
+		   double oldAngle = source.getAngle();
+		   double angle = xvector.getAngle();
+		   double newAngle = oldAngle-angle;
+		   return new Vector(source.getSize(),newAngle);
+	}
 	public double getComponentX(){//返回x分量
 		return componentX;
 	}
@@ -39,7 +44,7 @@ public class Vector {
 		componentX += addendVector.getComponentX();
 		componentY += addendVector.getComponentY();
 	}
-	public void reset(double componentX,double componentY){
+	public void resetComponent(double componentX,double componentY){
 		this.componentX = componentX;
 		this.componentY = componentY;
 	}

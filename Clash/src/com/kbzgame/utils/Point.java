@@ -1,7 +1,6 @@
 package com.kbzgame.utils;
 
 public class Point {
-//	对点的定义  x,y轴，加减操作
 	private double x;
 	private double y;
 	public Point(double x,double y){
@@ -24,6 +23,6 @@ public class Point {
 	}
 	
 	public String toString(){
-		return x+" "+y;
+		return x+","+y;
 	} 
 }

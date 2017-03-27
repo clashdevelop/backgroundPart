@@ -9,7 +9,7 @@ public class GameViewTest {
 	static GameView game;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//game  = new GameView();
+		game  = new GameView();
 	
 		
 		DeleyThread deley = new DeleyThread();
@@ -18,22 +18,31 @@ public class GameViewTest {
 	}
 	static class DeleyThread extends Thread{
 		public GameView game;
-		private static int count = 0;
+		private int count = 0;
 		@Override
 		public void run(){
+			Roller testRoller = new Roller("test1");
 			try{
 			while(count<4){
-				game.addRoller(new Roller(String.valueOf(++count)));
-				try {
+				if(count==0)
+			//	game.addRoller(testRoller.clone());
+				
+				if(count==2){
+					System.out.println("change roller");
+					//testRoller.setName("Jack");
+					//game.updateRoller(testRoller.clone());
+					}
+					try {
 						TimeUnit.SECONDS.sleep(1);
-					} catch (InterruptedException e) {
+						} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 						System.out.println("addRoller Thread was Interrupted!!");
 						break;
 					}
+					count++;
+					System.out.println(count);
 				}
-			
-		}finally{game.dispose();}
+			}finally{game.dispose();}
 		}
 	}
 }

@@ -1,0 +1,64 @@
+//:GamePad is  used to create command by user message
+package com.kbzgame.controller;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import com.kbzgame.service.command.CommandFactory;
+import com.kbzgame.service.command.Command;
+import com.kbzgame.service.gamebase.Roller;
+
+public class Gamepad {
+	private Roller roller;
+	private GameView gameView;
+	private BlockingQueue<Command> commandList = new LinkedBlockingQueue<Command>();
+	private ExecutorService taskManager = Executors.newCachedThreadPool();
+
+	public Gamepad(GameView gameView){
+		this.gameView = gameView;
+	}
+	
+	public void joinGame(String name){
+		roller = new Roller(name);
+		synchronized (gameView) {
+			gameView.addRoller(roller);//线程安全
+		}
+		taskManager.execute(new ExecuteCommandTask());
+	}
+	public void quitGame(){
+		gameView.removeRoller(roller);
+		taskManager.shutdownNow();
+	}
+	public void acceptCommandMessage(String commandMessage){
+		System.out.println("Accept a command");
+		Command newCommand = CommandFactory.creatCommand(commandMessage, roller);
+		try {
+			commandList.put(newCommand);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Interruted when wait put newCommand");
+			e.printStackTrace();
+		}
+	}
+	private class ExecuteCommandTask implements Runnable{
+		@Override
+		public void run(){
+			// TODO Auto-generated method stub
+			try{
+				//执行命令
+				while(!Thread.interrupted()){
+					Command exeCommand = commandList.take();//线程安全
+					exeCommand.execute();//对roller对象进行了操作
+					gameView.exeCommand(exeCommand);//执行命令，更新gameView中的对象
+				}
+			}catch(InterruptedException e){
+				System.out.println("Interrupted when wait for newCommand!");
+				e.printStackTrace();
+			}
+		}
+	}
+	
+}
+///：~
