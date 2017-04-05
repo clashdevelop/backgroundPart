@@ -21,11 +21,9 @@ public class Gamepad {
 	}
 	
 	public void joinGame(String name){
-		roller = new Roller(name);
-		synchronized (gameView) {
-			gameView.addRoller(roller);//线程安全
-		}
 		taskManager.execute(new ExecuteCommandTask());
+		roller = new Roller(name);
+		gameView.addRoller(roller);//线程安全
 	}
 	public void quitGame(){
 		gameView.removeRoller(roller);
@@ -50,7 +48,7 @@ public class Gamepad {
 				//执行命令
 				while(!Thread.interrupted()){
 					Command exeCommand = commandList.take();//线程安全
-					exeCommand.execute();//对roller对象进行了操作
+					//1//exeCommand.execute();//对roller对象进行了操作
 					gameView.exeCommand(exeCommand);//执行命令，更新gameView中的对象
 				}
 			}catch(InterruptedException e){

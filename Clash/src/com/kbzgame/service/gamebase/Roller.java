@@ -8,13 +8,13 @@ import com.kbzgame.utils.Vector;
 public class Roller implements Crashable{
 	private static int count = 0;
 	
-	private final float k =  0.25f;
-	private final float g = 9.8f;
+	private final float k =  0.05f;
+	private final float g = 0.98f;
 	private final int id = count++;
 	
 	private Point position;
 	private float r;
-	//private Vector mouseF;//鼠标提供的外力
+	private Vector mouseF;//鼠标提供的外力
 	private Vector otherF;//其他的力
 	private Vector v;//速度
 	private Vector a;//加速度
@@ -27,7 +27,7 @@ public class Roller implements Crashable{
 		a = new Vector(0,0);
 		v = new Vector(0,0);
 		alive = true;
-	//	mouseF = new Vector(0,0);
+		mouseF = new Vector(0,0);
 		otherF = new Vector(0,0);
 		r = 5;
 		m = 1;
@@ -41,12 +41,18 @@ public class Roller implements Crashable{
 			Vector f = new Vector(fSize,v.getAngle()+Math.PI);//方向与速度方向相反
 			fTotal.addVector(f);
 		}
-		fTotal.addVector(otherF);
-		otherF.resetComponent(0,0);//更新位置之后，力变化
+		fTotal.addVector(otherF);//添加可能的外力
+		fTotal.addVector(mouseF);//添加鼠标提供的力
+		otherF.resetComponent(0,0);//更新位置之后，外力清零
+		mouseF.resetComponent(0, 0);//更新之后，鼠标力清零
+		
 		//System.out.println(""+fTotal.getSize()+" "+fTotal.getComponentX()+" "+fTotal.getComponentY());
 		a = fTotal.divByNum(m);
+		System.out.println(id+"a:"+a.getSize());
 		changeV();
+		System.out.println(id+"v:"+v.getSize());
 		changePosition();
+		
 		
 	}
 	@Override
@@ -62,6 +68,7 @@ public class Roller implements Crashable{
 	@Override
 	public void outAction(Vector backVector) {
 		// TODO Auto-generated method stub
+		//System.out.println("**Out!!**");
 		position.changeBy(backVector.getComponentX(),backVector.getComponentY());
 	}
 
@@ -77,13 +84,14 @@ public class Roller implements Crashable{
 	@Override
 	public void crashAction(Vector F) {
 		// TODO Auto-generated method stub
-		otherF.addVector(F);;
+		//System.out.println("**Crash!!**");
+		otherF.addVector(F);
 	}
 	public void dead(){
 		alive = false;
 	}
 	public void addMouseF(Vector mouseF){
-		otherF.addVector(mouseF);;
+		this.mouseF = mouseF;;
 	}
 	public Point getPosition(){return position;}
 	public int getID(){return id;}

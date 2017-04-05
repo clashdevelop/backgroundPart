@@ -22,7 +22,6 @@ public  class OutsideEvent extends Event{
 	@Override
 	public boolean alive() {
 		// TODO Auto-generated method stub
-		
 		return outTester.alive();
 	}
 	

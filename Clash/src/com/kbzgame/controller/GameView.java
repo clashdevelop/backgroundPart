@@ -46,7 +46,7 @@ public class GameView {
 	}
 	public void exeCommand(Command exeCommand){
 		synchronized (this) {
-			System.out.println("Execute command");
+			//System.out.println("Execute command");
 			exeCommand.execute();//命令的执行需要改变roller对象,临界资源
 		}
 	}
@@ -70,8 +70,9 @@ public class GameView {
 		return message;
 	}
 	public void dispose(){//游戏结束用于终结启动的线程
-		//stop = true;
-		taskManager.shutdownNow();
+		synchronized (this) {
+			taskManager.shutdownNow();
+		}
 	}		
 	protected class UpdateTask implements Runnable{
 		@Override
@@ -82,11 +83,8 @@ public class GameView {
 //					System.out.println("update roller!");
 					List<Movable> deadMoverList = new ArrayList<Movable>();
 					List<Event> deadEventLsit = new ArrayList<Event>();
-					Iterator<Movable> moverItor =  moverList.iterator();
-					Iterator<Event> eventItor =  eventList.iterator();
 					synchronized (this){
-						while(moverItor.hasNext()){
-							Movable mover = moverItor.next();
+						for(Movable mover:moverList){
 							if(mover.alive()){
 								mover.move();		
 							}
@@ -94,8 +92,8 @@ public class GameView {
 								deadMoverList.add(mover);
 							}
 						}
-						while(eventItor.hasNext()){
-							Event event = eventItor.next();
+						
+						for(Event event:eventList){
 							if(event.alive()){
 								if(event.happen())
 									event.action();
@@ -104,11 +102,17 @@ public class GameView {
 							}		
 						}
 						//清理不存在的event和movable
-						moverList.removeAll(deadMoverList);
 						eventList.removeAll(deadEventLsit);
+						moverList.removeAll(deadMoverList);
 						//更新其他的相关的list
 						updateList();
 						updateMess = true;//需要刷新message
+						
+						//System.out.println("eventList: "+eventList.size());
+						//System.out.println("moverList: "+moverList.size());
+						System.out.println("rollerList: "+rollerList.size());
+						//System.out.println("crashableList: "+crashableList.size());
+
 					}
 					TimeUnit.MICROSECONDS.sleep(200);
 				}
@@ -121,7 +125,7 @@ public class GameView {
 	}
 	private void addCrashable(Crashable newCrashable){
 		for(Crashable crashable:crashableList){
-			Event event = EventFactory.creatEvent(crashable, newCrashable);
+			Event event = EventFactory.creatEvent(newCrashable, crashable);
 			eventList.add(event);
 		}
 		crashableList.add(newCrashable);

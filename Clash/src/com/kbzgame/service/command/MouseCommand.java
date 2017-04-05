@@ -20,8 +20,8 @@ public class MouseCommand extends Command{
 		Vector mouseF = new Vector(0,0);
 		float times = 0.1f;
 		//Point rollerpos = reciver.getPosition();
-		double dx = mouseX * times;
-		double dy = mouseY * times;
+		double dx = 1 * times;
+		double dy = 1 * times;
 		mouseF.resetComponent(dx,dy);;
 		reciver.addMouseF(mouseF);
 	}

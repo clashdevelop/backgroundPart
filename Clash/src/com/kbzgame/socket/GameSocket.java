@@ -52,6 +52,8 @@ public class GameSocket {//每一个用户都有一个此类的对象
 	@OnError
 	public void onError(Session session,Throwable error){
 		System.out.println("Error");
+		
+		System.out.println("玩家减一");
 		gamepad.quitGame();
 		taskmanager.shutdownNow();
 	}

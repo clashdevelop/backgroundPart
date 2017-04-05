@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Threejs test</title>
+		<style type="text/css">
+			body{
+				margin:0;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+				position: absolute;
+			}
+			.hid{
+				/*display: none;*/
+			}
+			html{
+				cursor: url("./img/aiming.cur"),auto;
+				cursor: url("./img/aiming.cur"),-moz-zoom-out;
+			}
+		</style>
+	</head>
+	<body>
+        <div id="WebGL-output" class="hid"></div>
+        <!-- 库文件 -->
+		<script type="text/javascript" src="../libs/three.js"></script>
+		<script type="text/javascript" src="../libs/jquery-1.9.0.js"></script>
+        <script type="text/javascript" src="../libs/DDSLoader.js"></script>
+        <!-- 引入文件 -->
+        <!--  <script type="text/javascript" src="./js/server"></script>-->
+        <script type="text/javascript" src="./js/Bases/position.js"></script>
+        <script type="text/javascript" src="./js/Bases/drawBase.js"></script>
+        <script type="text/javascript" src="./js/Bases/map.js"></script>
+        <script type="text/javascript" src="./js/Bases/ball.js"></script>
+        <script type="text/javascript" src="./js/Bases/camera.js"></script>
+        <script type="text/javascript" src="./js/Bases/mouse.js"></script>
+        <!-- 引入控制文件 -->
+        <script type="text/javascript" src="./js/Control/updateControl.js"></script>
+        <script type="text/javascript" src="./js/Control/websocketControl.js"></script>
+
+        <script type="text/javascript" src="./js/test.js"></script>
+
+	</body>
+</html>

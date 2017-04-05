@@ -13,7 +13,7 @@ public class CommandFactory {
 			double x = message.getDouble("x");
 			double y = message.getDouble("y");
 			MouseCommand command = new MouseCommand(reciver,x,y);
-			System.out.println("mouseCommand"+command);
+			//System.out.println("mouseCommand"+command);
 			return command;
 		}
 		return null;
