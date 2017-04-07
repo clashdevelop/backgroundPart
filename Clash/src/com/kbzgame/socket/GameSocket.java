@@ -34,6 +34,7 @@ public class GameSocket {//每一个用户都有一个此类的对象
 		gamepad = new Gamepad(gameView);
 		System.out.println("玩家加一");
 		gamepad.joinGame("Bob");
+		sendMessage(gamepad.getGamePadId());//发送玩家的id
 		taskmanager.execute(new sendMessageTask());//启动读取信息线程
 	}
 	@OnClose//用户断开连接
@@ -58,19 +59,19 @@ public class GameSocket {//每一个用户都有一个此类的对象
 		taskmanager.shutdownNow();
 	}
 	
-	private void sendMessage(String message) throws IOException{
-		session.getBasicRemote().sendText(message);
+	private void sendMessage(String message) {
+		try {
+			session.getBasicRemote().sendText(message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("****Error when send message****");
+			e.printStackTrace();
+		}
 	}
 	
 	private void notifyAllPlayer(String message){
 		for(GameSocket player:playerSet){
-			try {
-				player.sendMessage(message);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("Error on onMessage");
-				e.printStackTrace();
-			}
+			player.sendMessage(message);
 		}
 	
 	}
@@ -87,8 +88,6 @@ public class GameSocket {//每一个用户都有一个此类的对象
 				}
 			}catch(InterruptedException e){
 				//System.out.println("exit from interruptedException");
-			}catch(IOException e){
-				System.out.println("erro when send message");
 			}
 		}
 	}

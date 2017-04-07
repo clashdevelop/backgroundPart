@@ -10,6 +10,8 @@ import com.kbzgame.service.command.CommandFactory;
 import com.kbzgame.service.command.Command;
 import com.kbzgame.service.gamebase.Roller;
 
+import net.sf.json.JSONObject;
+
 public class Gamepad {
 	private Roller roller;
 	private GameView gameView;
@@ -29,6 +31,17 @@ public class Gamepad {
 		gameView.removeRoller(roller);
 		taskManager.shutdownNow();
 	}
+	public String getGamePadId(){
+		JSONObject sendMess = new JSONObject();
+		sendMess.put("type", "localId");
+		if(roller != null){
+			sendMess.put("content",roller.getID());
+		}else{
+			sendMess.put("content", -1);
+		}
+		return sendMess.toString();
+	}
+	
 	public void acceptCommandMessage(String commandMessage){
 		System.out.println("Accept a command");
 		Command newCommand = CommandFactory.creatCommand(commandMessage, roller);
