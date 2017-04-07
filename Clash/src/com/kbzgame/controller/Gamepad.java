@@ -33,6 +33,9 @@ public class Gamepad {
 		System.out.println("Accept a command");
 		Command newCommand = CommandFactory.creatCommand(commandMessage, roller);
 		try {
+			if(commandList.size()!=0){
+				commandList.take();
+			}
 			commandList.put(newCommand);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -57,6 +60,5 @@ public class Gamepad {
 			}
 		}
 	}
-	
 }
 ///£º~

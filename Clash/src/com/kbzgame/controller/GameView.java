@@ -110,7 +110,7 @@ public class GameView {
 						
 						//System.out.println("eventList: "+eventList.size());
 						//System.out.println("moverList: "+moverList.size());
-						System.out.println("rollerList: "+rollerList.size());
+						//System.out.println("rollerList: "+rollerList.size());
 						//System.out.println("crashableList: "+crashableList.size());
 
 					}

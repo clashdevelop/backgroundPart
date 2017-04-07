@@ -8,10 +8,10 @@ import com.kbzgame.utils.Vector;
 public class Roller implements Crashable{
 	private static int count = 0;
 	
-	private final float k =  0.05f;
-	private final float g = 0.98f;
+	private final float k =  0.01f;
+	private final float g = 0.02f;
 	private final int id = count++;
-	
+	private final double maxV = 0.01;
 	private Point position;
 	private float r;
 	private Vector mouseF;//鼠标提供的外力
@@ -35,22 +35,25 @@ public class Roller implements Crashable{
 	@Override
 	public void move(){
 		Vector fTotal = new Vector(0,0);
-		if(v.getSize()!=0){
+		if(v.getSize()>0){
 			//System.out.println("V isn't 0.");
 			float fSize = k*m*g;//计算摩擦力的大小
 			Vector f = new Vector(fSize,v.getAngle()+Math.PI);//方向与速度方向相反
+			System.out.println("f:"+f.getSize()+","+f.getAngle());
+			//System.out.println("f:"+f.getAngle()+",v:"+v.getAngle());
 			fTotal.addVector(f);
 		}
 		fTotal.addVector(otherF);//添加可能的外力
 		fTotal.addVector(mouseF);//添加鼠标提供的力
+		System.out.println("mouseF:"+mouseF.getSize()+","+mouseF.getAngle());
 		otherF.resetComponent(0,0);//更新位置之后，外力清零
 		mouseF.resetComponent(0, 0);//更新之后，鼠标力清零
 		
 		//System.out.println(""+fTotal.getSize()+" "+fTotal.getComponentX()+" "+fTotal.getComponentY());
 		a = fTotal.divByNum(m);
-		System.out.println(id+"a:"+a.getSize());
+		//System.out.println(id+"a:"+a.getSize());
 		changeV();
-		System.out.println(id+"v:"+v.getSize());
+		System.out.println(id+"v:"+v.getSize()+v.getAngle());
 		changePosition();
 		
 		
@@ -91,7 +94,7 @@ public class Roller implements Crashable{
 		alive = false;
 	}
 	public void addMouseF(Vector mouseF){
-		this.mouseF = mouseF;;
+		this.mouseF = mouseF;
 	}
 	public Point getPosition(){return position;}
 	public int getID(){return id;}
@@ -107,6 +110,12 @@ public class Roller implements Crashable{
 	
 	private void changeV(){
 		v.addVector(a);
+		if(v.getSize()>=maxV){
+			v = new Vector(maxV,v.getAngle());
+		}
+		if(v.getSize()<= k*g){
+			v = new Vector(0,0);
+		}
 	}
 	private void changePosition(){
 		position.changeBy(v.getComponentX(),v.getComponentY());
