@@ -39,13 +39,13 @@ public class Roller implements Crashable{
 			//System.out.println("V isn't 0.");
 			float fSize = k*m*g;//计算摩擦力的大小
 			Vector f = new Vector(fSize,v.getAngle()+Math.PI);//方向与速度方向相反
-			System.out.println("f:"+f.getSize()+","+f.getAngle());
+//			System.out.println("f:"+f.getSize()+","+f.getAngle());
 			//System.out.println("f:"+f.getAngle()+",v:"+v.getAngle());
 			fTotal.addVector(f);
 		}
 		fTotal.addVector(otherF);//添加可能的外力
 		fTotal.addVector(mouseF);//添加鼠标提供的力
-		System.out.println("mouseF:"+mouseF.getSize()+","+mouseF.getAngle());
+//		System.out.println("mouseF:"+mouseF.getSize()+","+mouseF.getAngle());
 		otherF.resetComponent(0,0);//更新位置之后，外力清零
 		mouseF.resetComponent(0, 0);//更新之后，鼠标力清零
 		
@@ -53,7 +53,7 @@ public class Roller implements Crashable{
 		a = fTotal.divByNum(m);
 		//System.out.println(id+"a:"+a.getSize());
 		changeV();
-		System.out.println(id+"v:"+v.getSize()+v.getAngle());
+//		System.out.println(id+"v:"+v.getSize()+v.getAngle());
 		changePosition();
 		
 		
