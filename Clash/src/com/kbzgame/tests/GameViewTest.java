@@ -34,7 +34,8 @@ public class GameViewTest {
 					}
 					try {
 						TimeUnit.SECONDS.sleep(1);
-						} catch (InterruptedException e) {
+						} catch (InterruptedException e) 
+						{
 					// TODO Auto-generated catch block
 						System.out.println("addRoller Thread was Interrupted!!");
 						break;
@@ -42,7 +43,8 @@ public class GameViewTest {
 					count++;
 					System.out.println(count);
 				}
-			}finally{game.dispose();}
+			}
+			finally{game.dispose();}
 		}
 	}
 }

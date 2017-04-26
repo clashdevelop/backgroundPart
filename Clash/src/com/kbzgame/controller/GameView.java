@@ -36,6 +36,7 @@ public class GameView {
 	public GameView(){
 		updateMess = true;
 		taskManager.execute(new UpdateTask());
+	
 	}
 	public void addRoller(Roller newRoller){
 		synchronized (this){

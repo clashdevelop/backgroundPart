@@ -3,10 +3,10 @@ package com.kbzgame.service.event;
 import com.kbzgame.service.gamebase.Crashable;
 import com.kbzgame.utils.Vector;
 
-public class CrashEvent extends Event{
+public class CrashableCrashEvent extends Event{
 	private Crashable crasherA;
 	private Crashable crasherB;
-	public CrashEvent(Crashable crasherA,Crashable crasherB){
+	public CrashableCrashEvent(Crashable crasherA,Crashable crasherB){
 		this.crasherA = crasherA;
 		this.crasherB = crasherB;
 	}

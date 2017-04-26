@@ -24,6 +24,7 @@ public class Gamepad {
 	
 	public void joinGame(String name){
 		taskManager.execute(new ExecuteCommandTask());
+		
 		roller = new Roller(name);
 		gameView.addRoller(roller);//线程安全
 	}
