@@ -2,6 +2,7 @@ package com.kbzgame.service.event;
 
 
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -137,8 +138,53 @@ public class ShapeCrashManager {
 	}
 	public static Vector getRectAndRectDirection(Rect r1,Rect r2)
 	{
+		
+		List<Point> r1List=new ArrayList<Point>();
+		r1List.add(r1.getRotateLowerLeft());
+		r1List.add(r1.getRotateLowerRight());
+		r1List.add(r1.getRotateTopLeft());
+		r1List.add(r1.getRotateTopRight());
+		List<Point> r2List=new ArrayList<Point>();
+		r2List.add(r2.getRotateLowerLeft());
+		r2List.add(r2.getRotateLowerRight());
+		r2List.add(r2.getRotateTopLeft());
+		r2List.add(r2.getRotateTopRight());
+		for(int i=0;i<4;i++)
+		{
+			for(int j=0;j<4;j++)
+			{
+				//if(r1List.get(i).equals(r2List.get(j)))//判断条件不是很合适，等整合测试了再试吧
+				if((r1List.get(i).getX()-r2List.get(j).getX()<1)&&(r1List.get(i).getY()-r2List.get(j).getY()<1))
+				{
+					return new Vector(r1List.get(i).getX(),r1List.get(i).getY(),r2List.get(j).getX(),r2List.get(j).getY());
+				}
+			}
+		}
+		
+		Vector vx=new Vector(r1.getRotateLowerLeft().getX(),r1.getRotateLowerLeft().getY(),r1.getRotateLowerRight().getX(),r1.getRotateLowerRight().getY());
+		Vector zeroToR1TopLeft=new Vector(0,0,r1.getRotateTopLeft().getX(),r1.getRotateTopLeft().getY());
+//		Vector zeroToR1LowerRight=new Vector(0,0,r1.getRotateLowerRight().getX(),r1.getRotateLowerRight().getY());
+//		Vector zeroToR2TopLeft=new Vector(0,0,r2.getRotateTopLeft().getX(),r2.getRotateTopLeft().getY());
+//		Vector zeroToR2LowerLeft=new Vector(0,0,r2.getRotateLowerLeft().getX(),r2.getRotateLowerLeft().getY());
+//		Vector zeroToR2TopRight=new Vector(0,0,r2.getRotateTopRight().getX(),r2.getRotateTopRight().getY());
+		Vector zeroToR2LowerRight=new Vector(0,0,r2.getRotateLowerRight().getX(),r2.getRotateLowerRight().getY());
+		Vector zeroToR2Center=new Vector(0,0,r2.getCenter().getX(),r2.getCenter().getY());
+//		Vector n1=Vector.convertVectorToReferenceFrame(zeroToR2Center, vx);
+		Vector n1=Vector.convertVectorToReferenceFrame(zeroToR1TopLeft, vx);
+		Vector n2=Vector.convertVectorToReferenceFrame(zeroToR2LowerRight, vx);
+		Vector n3=Vector.convertVectorToReferenceFrame(zeroToR2Center, vx);
+		double x0= n1.getComponentX()<n2.getComponentX()?n1.getComponentX():n2.getComponentX();
+		double y0=n1.getComponentY()>n2.getComponentY()?n1.getComponentY():n2.getComponentY();
+		double x1=n1.getComponentX()>n2.getComponentX()?n1.getComponentX():n2.getComponentX();
+		double y1=n1.getComponentY()<n2.getComponentY()?n1.getComponentY():n2.getComponentY();
+		double x2=n3.getComponentX();
+		double y2=n3.getComponentY();
+		if(x2>x1)return Vector.convertVectorToReferenceFrame(new Vector(x1,y1,x0,y1), new Vector(1,0));
+		else if(y2<y1) return Vector.convertVectorToReferenceFrame(new Vector(x1,y1,x1,y0), new Vector(1,0));
+		else if(x2<x1)return Vector.convertVectorToReferenceFrame(new Vector(x0,y0,x1,y0), new Vector(1,0));
+		else if(y2>y1)return Vector.convertVectorToReferenceFrame(new Vector(x1,y0,x1,y1), new Vector(1,0));
+		
 		return null;
-		//未完成
 		
 	}
 	public static Vector getRectCrashDirection(Circle circle,Rect rect){
